@@ -71,10 +71,9 @@
 
     <script>
         $(function () {
-            var url;
             var regex = /^http(?:s?):\/\/(?:www\.)?youtu(?:be\.com\/watch\?v=|\/)([\w\-\_]*)(&(amp;)?‌​[\w\?‌​=]*)?/gm;
             $("#btn_fetch").click(function () {
-                url = $("#txt_url").val();
+               var url = $("#txt_url").val();
                 if(url==null || url == "" || !url.includes("youtube")){
                     console.log
                     alert("Please enter a valid Youtube url! \nExample: https://www.youtube.com/watch?v=OxD2nEyO-ug")
@@ -116,6 +115,7 @@
             }
             });
             $("#get-api").click(function () {
+               var url = $("#txt_url").val();
                 if(url==null || url == "" || !url.includes("youtube")){
                     alert("Please enter a valid Youtube url! \nExample: https://www.youtube.com/watch?v=OxD2nEyO-ug")
                 }
