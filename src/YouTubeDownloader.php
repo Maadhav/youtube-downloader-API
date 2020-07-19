@@ -135,7 +135,7 @@ class YouTubeDownloader
             $return = array();
 
             foreach ($formats_combined as $item) {
-                $cipher = isset($item['cipher']) ? $item['cipher'] : '';
+                $cipher = isset($item['signatureCipher']) ? $item['signatureCipher'] : '';
                 $itag = $item['itag'];
 
                 // some videos do not need to be decrypted!
