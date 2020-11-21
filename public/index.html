@@ -1,134 +1,75 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
-    <link href="https://fonts.googleapis.com/css?family=Montserrat:400,700" rel="stylesheet">
-    <style>
-        body {
-            font-family: 'Montserrat';
-            font-size: 22px;
-            text-align: center;
-        }
-
-        input[type=text] {
-            width: 50%;
-            padding: 20px 20px;
-            margin: 50px 0;
-            box-sizing: border-box;
-            background-color: #3CBC8D;
-            color: white;
-            border: 7px solid #555;
-            font-size: 20px;
-            font-family: 'Montserrat';
-        }
-        input[type=button] {
-            width: 10%;
-            padding: 20px 0px;
-            margin: 50px 0;
-            box-sizing: border-box;
-            background-color: white;
-            color:#555;
-            font-weight: bold;
-            border: 7px solid #3CBC8D;
-            font-size: 20px;
-            font-family: 'Montserrat';
-        }
-        input[id=get-api] {
-            width: 10%;
-            padding: 20px 0px;
-            margin: 50px 0;
-            box-sizing: border-box;
-            background-color: red;
-            color:white;
-            font-weight: bold;
-            border: 7px solid #555;
-            font-size: 20px;
-            font-family: 'Montserrat';
-        }
-    </style>
     <meta charset="UTF-8">
-    <title>Youtube Downloader</title>
+    <title>youtube-downloader</title>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
 </head>
-
 <body>
-    <h1>YouTube Downloader By <span style="text-shadow: #3CBC8D 4px 4px 10px ;font-size: 65px;">Maadhav Sharma</span></h1>
-    <p style="font-size: 23px;">
-        Source Code:
-        <a href="https://github.com/Maadhav/youtube-downloader-API">https://github.com/Maadhav/youtube-downloader-API</a>
-    </p>
-    <form>
-        <input type="text" placeholder="Insert A Youtube Link Here: https://www.youtube.com/watch?v=YSuHrTfcikU" size="80" id="txt_url">
-        <input type="button" id="btn_fetch" value="Download" onclick="">
-        <input type="button" id="get-api" value="Get API">
-    </form>
 
-    <video width="600" height="400" controls>
-        <source src="" type="video/mp4" />
-        <em>Sorry, your browser doesn't support HTML5 video.</em>
-    </video>
+<h1>YouTube Downloader</h1>
 
-
-    <script>
-        $(function () {
-            var regex = /^http(?:s?):\/\/(?:www\.)?youtu(?:be\.com\/watch\?v=|\/)([\w\-\_]*)(&(amp;)?‌​[\w\?‌​=]*)?/gm;
-            $("#btn_fetch").click(function () {
-               var url = $("#txt_url").val();
-                if(url==null || url == "" || !url.includes("youtube")){
-                    console.log
-                    alert("Please enter a valid Youtube url! \nExample: https://www.youtube.com/watch?v=OxD2nEyO-ug")
-                }
-                else{
-                var oThis = $(this);
-                oThis.attr('disabled', true);
-                
-                $.get('video_info.php', { url: url }, function (data) {
-                    
-                    console.log(data);
-                    
-                    oThis.attr('disabled', false);
-                    
-                    var links = data['links'];
-                    var error = data['error'];
-                    
-                    if (error) {
-                        alert('Error: ' + error);
-                        return;
-                    }
-                    
-                    // first link with video
-                    var first = links.find(function (link) {
-                        return link['format'].indexOf('video') !== -1;
-                    });
-                    
-                    if (typeof first === 'undefined') {
-                        alert('No video found!');
-                        return;
-                    }
-                    
-                    var stream_url = 'stream.php?url=' + encodeURIComponent(first['url']);
-                    
-                    var video = $("video");
-                    video.attr('src', stream_url);
-                    video[0].load();
-                });
-            }
-            });
-            $("#get-api").click(function () {
-               var url = $("#txt_url").val();
-                if(url==null || url == "" || !url.includes("youtube")){
-                    alert("Please enter a valid Youtube url! \nExample: https://www.youtube.com/watch?v=OxD2nEyO-ug")
-                }
-                else
-                window.location.href = "https://maadhav-ytdl.herokuapp.com/video_info.php?url="+ url;
-            });
-            
-        });
-        </script>
-  <p style="font-size: 16px;">
-    Project Originally Forked From: 
+<p>
     <a href="https://github.com/Athlon1600/youtube-downloader">https://github.com/Athlon1600/youtube-downloader</a>
 </p>
-</body>
 
+<form>
+    <input type="text" value="https://www.youtube.com/watch?v=aqz-KE-bpKQ" size="80" id="txt_url">
+    <input type="button" id="btn_fetch" value="Fetch">
+</form>
+
+<video width="800" height="600" controls>
+    <source src="" type="video/mp4"/>
+    <em>Sorry, your browser doesn't support HTML5 video.</em>
+</video>
+
+
+<script>
+    $(function () {
+
+        $("#btn_fetch").click(function () {
+
+            var url = $("#txt_url").val();
+
+            var oThis = $(this);
+            oThis.attr('disabled', true);
+
+            $.get('video_info.php', {url: url}, function (data) {
+
+                console.log(data);
+
+                oThis.attr('disabled', false);
+
+                var links = data['links'];
+                var error = data['error'];
+
+                if (error) {
+                    alert('Error: ' + error);
+                    return;
+                }
+
+                // first link with video
+                var first = links.find(function (link) {
+                    return link['format'].indexOf('video') !== -1;
+                });
+
+                if (typeof first === 'undefined') {
+                    alert('No video found!');
+                    return;
+                }
+
+                var stream_url = 'stream.php?url=' + encodeURIComponent(first['url']);
+
+                var video = $("video");
+                video.attr('src', stream_url);
+                video[0].load();
+            });
+
+        });
+
+    });
+</script>
+
+</body>
 </html>
+
