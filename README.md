@@ -7,17 +7,16 @@
 # youtube-downloader
 
 This project was inspired by a very popular youtube-dl python package:  
-https://github.com/rg3/youtube-dl ([**which has been very recently removed from github**](https://news.ycombinator.com/item?id=24872911))
+https://github.com/rg3/youtube-dl
 
 Yes, there are multiple other PHP-based youtube downloaders on the Internet, 
 but most of them haven't been updated in years, or they depend on youtube-dl itself.  
 
 Pure PHP-based youtube downloaders that work, and are **kept-up-to date** just do not exist.
 
-This script does not depend on anything other than cURL. 
-No Javascript interpreters, no calls to shell... nothing but pure PHP with no heavy dependencies either.
+This script uses no Javascript interpreters, no calls to shell... nothing but pure PHP with no heavy dependencies either.
 
-![](https://i.imgur.com/lW3OxvG.png?1)
+![](https://i.imgur.com/39LIE0r.png)
 
 That's all there is to it!
 
@@ -32,7 +31,7 @@ We are not responsible for people who attempt to use this program in any way tha
 
 This may not work at all times, because YouTube puts a short ban on the server if it receives too many requests from it.
 
-- https://youtube-downloader3.herokuapp.com/
+- https://youtube-downloader-jan16.herokuapp.com/
 
 ![](http://proxynova.s3.us-east-1.amazonaws.com/youtube-downloader-save-video.png)
 
@@ -53,7 +52,7 @@ Installation
 Recommended way of installing this is via [Composer](http://getcomposer.org):
 
 ```bash
-composer require athlon1600/youtube-downloader
+composer require athlon1600/youtube-downloader "^2.0"
 ```
 
 Run locally:
