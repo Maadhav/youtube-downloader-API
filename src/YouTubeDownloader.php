@@ -142,23 +142,18 @@ class YouTubeDownloader
             throw new YouTubeException('Video not found');
         }
 
-        // get JSON encoded parameters that appear on video pages
-        $player_response = $page->getPlayerResponse();
+         // get JSON encoded parameters that appear on video pages
+         $json = $this->getPlayerResponse($page_html);
 
-        // it may ask you to "Sign in to confirm your age"
-        // we can bypass that by querying /get_video_info
-        if (!$page->hasPlayableVideo()) {
-            $player_response = $this->getVideoInfo($video_id)->getPlayerResponse();
-        }
-
-        if (empty($player_response)) {
-            throw new VideoPlayerNotFoundException();
-        }
-
-        // get player.js location that holds signature function
-        $player_js = $page->getCachedPlayerContents();
-        $result = $this->parseLinksFromPlayerResponse($player_response, $player_js);
-
+         if ($json === null) {
+             $json = $this->getVideoInfo($this->extractVideoId($video_id));
+         }
+ 
+         // get player.js location that holds signature function
+         $url = $this->getPlayerScriptUrl($page_html);
+         $js = $this->getPlayerCode($url);
+ 
+         $result = $this->parsePlayerResponse($json['player_response'], $js);
         return new DownloadOptions($result);
     }
 }
