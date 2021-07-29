@@ -2,13 +2,15 @@
 
 namespace YouTube;
 
-use YouTube\Data\StreamFormat;
 use YouTube\Exception\TooManyRequestsException;
+use YouTube\Exception\VideoNotFoundException;
 use YouTube\Exception\VideoPlayerNotFoundException;
 use YouTube\Exception\YouTubeException;
-use YouTube\Resources\GetVideoInfo;
-use YouTube\Resources\VideoPlayerJs;
-use YouTube\Resources\WatchVideoPage;
+use YouTube\Models\StreamFormat;
+use YouTube\Models\VideoDetails;
+use YouTube\Responses\GetVideoInfo;
+use YouTube\Responses\VideoPlayerJs;
+use YouTube\Responses\WatchVideoPage;
 use YouTube\Utils\Utils;
 
 class YouTubeDownloader
@@ -48,10 +50,13 @@ class YouTubeDownloader
         $video_id = Utils::extractVideoId($video_id);
 
         $response = $this->client->get("https://www.youtube.com/get_video_info?" . http_build_query([
-            'video_id' => $video_id,
-            'eurl' => 'https://youtube.googleapis.com/v/' . $video_id,
-            'el' => 'embedded' // or detailpage. default: embedded, will fail if video is not embeddable
-        ]));
+                'html5' => 1,
+                'video_id' => $video_id,
+                'eurl' => 'https://youtube.googleapis.com/v/' . $video_id,
+                'el' => 'embedded', // or detailpage. default: embedded, will fail if video is not embeddable
+                'c' => 'TVHTML5',
+                'cver' => '6.20180913'
+            ]));
 
         return new GetVideoInfo($response);
     }
@@ -138,8 +143,10 @@ class YouTubeDownloader
 
         if ($page->isTooManyRequests()) {
             throw new TooManyRequestsException($page);
-        } else if (!$page->isStatusOkay()) {
-            throw new YouTubeException('Video not found');
+        } elseif (!$page->isStatusOkay()) {
+            throw new YouTubeException('Page failed to load. HTTP error: ' . $page->getResponse()->error);
+        } elseif ($page->isVideoNotFound()) {
+            throw new VideoNotFoundException();
         }
         // get JSON encoded parameters that appear on video pages
         $player_response = $page->getPlayerResponse();
@@ -155,8 +162,15 @@ class YouTubeDownloader
         }
 
         // get player.js location that holds signature function
-        $player_js = $page->getCachedPlayerContents();
-        $result = $this->parseLinksFromPlayerResponse($player_response, $player_js);
-        return new DownloadOptions($result);
+        $player_url = $page->getPlayerScriptUrl();
+        $response = $this->getBrowser()->cachedGet($player_url);
+        $player = new VideoPlayerJs($response);
+
+        $links = $this->parseLinksFromPlayerResponse($player_response, $player);
+
+        // since we already have that information anyways...
+        $info = VideoDetails::fromPlayerResponseArray($player_response);
+
+        return new DownloadOptions($links, $info);
     }
 }
